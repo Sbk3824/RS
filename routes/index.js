@@ -5,7 +5,8 @@ var mongodb = require('mongodb');
   // Get a Mongo client to work with the Mongo server
   var MongoClient = mongodb.MongoClient;
   // Define where the MongoDB server is
-  var url = 'mongodb://13.57.140.130:27017/sampsite';
+  //var url = 'mongodb://13.57.140.130:27017/sampsite';
+  var url = 'mongodb://localhost:27017/sampsite';
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -110,8 +111,9 @@ router.get('/rspurchased/:userid', function(req, res){
 });
 
 
+
 // Add Search details to DB
-router.post('/addsearchedsimple', function(req, res){
+router.post('/addsearched', function(req, res){
     // Connect to the server
     MongoClient.connect(url, function(err, db){
       if (err) {
@@ -121,13 +123,21 @@ router.post('/addsearchedsimple', function(req, res){
  
 
         // Get the documents collection
-    
+        var collection = db.collection('searched');
+        var arrProducts = req.body.products;
+        var userProducts = [];
+        var userid = req.body.userid;
+
+        for(var i = 0; i < arrProducts.length; i++){
           // Get the purchased details passed from the form
-          var user = {userid: req.body.userid, productid: req.body.productid,
-             purchasetime: new Date()}; 
+          var user = {userid: userid, productid: arrProducts[i].productid,
+             purchasetime: new Date()};
+
+          userProducts.push(user);
+        }
 
         // Insert the purchase data into the database
-        collection.insert(user, function (err, result){
+        collection.insert(userProducts, function (err, result){
           if (err) {
             console.log(err);
           } else {
@@ -140,6 +150,8 @@ router.post('/addsearchedsimple', function(req, res){
       }
     });
   });
+
+
 
 
 
