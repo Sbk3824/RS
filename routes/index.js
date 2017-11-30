@@ -141,7 +141,7 @@ router.post('/addsearched', function(req, res){
           if (err) {
             console.log(err);
           } else {
-            res.send("Purchase Details Added")
+            res.send("Search Details Added")
           }
           // Close the database
           db.close();
