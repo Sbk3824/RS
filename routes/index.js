@@ -6,7 +6,7 @@ var mongodb = require('mongodb');
   var MongoClient = mongodb.MongoClient;
   // Define where the MongoDB server is
   //var url = 'mongodb://13.57.140.130:27017/sampsite';
-  var url = 'mongodb://localhost:27017/sampsite';
+  var url = 'mongodb://13.57.67.164:27017/sampsite';
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -35,7 +35,6 @@ router.get('/purchaselist', function(req, res){
       } else {
         res.send('No documents found');
       }
-      db.close();
     });
   }
   });
@@ -52,14 +51,13 @@ router.post('/addpurchased', function(req, res){
  
         // Get the documents collection
         var collection = db.collection('purchased');
-        var arrProducts = req.body.products;
+        var arrProducts = JSON.parse(req.body.products);
         console.log(arrProducts)
         var userProducts = [];
 
         for(var i = 0; i < arrProducts.length; i++){
           // Get the purchased details passed from the form
-          var user = {userid: arrProducts[i].userid, productid: arrProducts[i].productid, category: arrProducts[i].category,
-             purchasetime: new Date()};
+          var user = {userid: arrProducts[i].addedBy, productid: arrProducts[i].id, purchasetime: new Date()};
 
           userProducts.push(user);
         }
@@ -71,8 +69,7 @@ router.post('/addpurchased', function(req, res){
           } else {
             res.send("Purchase Details Added")
           }
-          // Close the database
-          db.close();
+         
         });
 
       }
@@ -208,36 +205,4 @@ router.get('/rssearched/:userid', function(req, res){
   }
   });
 });
-
-
-// Recommendations
-// Get productlist based on user purchased category
-router.get('/rscategory/:userid', function(req, res){
-  // Connect to the server
-  MongoClient.connect(url, function (err, db) {
-  if (err) {
-    console.log('Unable to connect to the Server', err);
-  } else {
-    var collection = db.collection('purchased');
- 
-    // FIND PRODUCT ID OF RECENTLY SEARCHED PRODUCT
-    collection.find({userid: req.params.userid},{"_id":0,"category":1}).toArray(function (err, result) {
-      if (err) {
-        res.send(err);
-      } else if (result.length) {
-        console.log(result)
-        res.send(result)
-        // Call product catalog web service to fetch details of product and display in Mainpage.
-      } else {
-        res.send('No documents found');
-      }
-      db.close();
-    });
-  }
-  });
-});
-
-
-
-
 module.exports = router;
